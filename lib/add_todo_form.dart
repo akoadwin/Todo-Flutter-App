@@ -1,7 +1,6 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, must_be_immutable, avoid_print
-
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class AddTodo extends StatefulWidget {
   AddTodo({
     super.key,
@@ -14,13 +13,6 @@ class AddTodo extends StatefulWidget {
     required String todoText,
   }) addTodo;
 
-  // void Function({
-  //   required String nameText,
-  // }) changeName;
-  // void Function({
-  //   required String lastNameText,
-  // }) changeLastName;
-
   @override
   State<AddTodo> createState() => _AddTodoState();
 }
@@ -32,10 +24,16 @@ class _AddTodoState extends State<AddTodo> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text("Add A Todo "),
+        const Text("Add A Todo "),
         TextField(
+          onSubmitted: (value) {
+            if (todoText.text.isNotEmpty) {
+              widget.addTodo(todoText: todoText.text);
+            }
+            todoText.text = '';
+          },
           autofocus: true,
-          decoration: InputDecoration(labelText: 'Add some todo'),
+          decoration: const InputDecoration(labelText: 'Add some todo'),
           controller: todoText,
         ),
         ElevatedButton(
@@ -45,7 +43,7 @@ class _AddTodoState extends State<AddTodo> {
               }
               todoText.text = '';
             },
-            child: Text("Add Button")),
+            child: const Text("Add Button")),
       ],
     );
   }

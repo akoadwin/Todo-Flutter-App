@@ -1,9 +1,9 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, avoid_print
-
 import 'package:flutter/material.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:todo_app/addTodo.dart';
+import 'package:todo_app/add_todo_form.dart';
+import 'package:todo_app/widgets/todo_list.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -21,11 +21,11 @@ class _MainScreenState extends State<MainScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text("Already Exist"),
+              title: const Text("Already Exist"),
               content: Text("$todoText is already Exist"),
               actions: [
                 InkWell(
-                  child: Text("Close"),
+                  child: const Text("Close"),
                   onTap: () {
                     Navigator.pop(context);
                   },
@@ -55,6 +55,28 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  void showBottomModal() {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return Wrap(
+            children: [
+              SingleChildScrollView(
+                  child: Container(
+                margin: const EdgeInsets.all(15),
+                padding: MediaQuery.of(context).viewInsets,
+                child: AddTodo(
+                  addTodo: addTodo,
+                  // changeName: changeName,
+                  // changeLastName: changeLastName,
+                ),
+              ))
+            ],
+          );
+        });
+  }
+
   @override
   void initState() {
     loadLocalData();
@@ -64,91 +86,68 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton: FloatingActionButton(
+            backgroundColor: (Colors.blueGrey.shade900),
+            onPressed: showBottomModal,
+            child: const Icon(
+              Icons.add_circle_outline_sharp,
+              size: 28,
+            )),
         resizeToAvoidBottomInset: true,
         drawer: Drawer(
-          child: Text("Inside Of this Drawer"),
-        ),
-        appBar: AppBar(
-          actions: [
-            InkWell(
-              onTap: () {
-                showModalBottomSheet(
-                    isScrollControlled: true,
-                    context: context,
-                    builder: (context) {
-                      return Wrap(
-                        children: [
-                          SingleChildScrollView(
-                              child: Container(
-                            margin: EdgeInsets.all(15),
-                            padding: MediaQuery.of(context).viewInsets,
-                            child: AddTodo(
-                              addTodo: addTodo,
-                              // changeName: changeName,
-                              // changeLastName: changeLastName,
-                            ),
-                          ))
-                        ],
-                      );
-                    });
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  FeatherIcons.plus,
-                  size: 25,
+          child: Column(
+            children: [
+              Container(
+                  padding: const EdgeInsets.only(top: 50),
+                  child: SizedBox(
+                    height: 140,
+                    child: UserAccountsDrawerHeader(
+                        decoration: BoxDecoration(
+                            color: Colors.blueGrey.shade900,
+                            borderRadius: BorderRadius.circular(4)),
+                        accountName: const Center(
+                          child: Text(
+                            "TODO APP",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        accountEmail: const Text("")),
+                  )),
+              const SizedBox(
+                height: 18,
+              ),
+              ListTile(
+                onTap: () {
+                  launchUrl(Uri.parse('https://github.com/akoadwin'));
+                },
+                leading: const Icon(
+                  Icons.person_4_sharp,
+                ),
+                title: const Text(
+                  "About Me",
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-            ),
-          ],
-          title: Text("TODO APP"),
+              ListTile(
+                onTap: () {
+                  launchUrl(Uri.parse('mailto:floresgodwin@gg.com'));
+                },
+                leading: const Icon(
+                  Icons.email_sharp,
+                ),
+                title: const Text(
+                  "Contact me",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
+        appBar: AppBar(
+          title: const Text("TODO APP"),
           centerTitle: true,
         ),
-        body: ListView.builder(
-            itemCount: todoList.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                onLongPress: () {
-                  print('Long Pressed');
-                },
-                onTap: () {
-                  showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return Container(
-                          padding: EdgeInsets.all(20),
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  todoList.removeAt(index);
-                                });
-                                updateLocalData();
-                                Navigator.pop(context);
-                              },
-                              child: Text("Mark as done"),
-                            ),
-                          ),
-                        );
-                      });
-                },
-                title: Text(todoList[index]),
-              );
-            })
-        // Container(
-        //     padding: EdgeInsets.all(10),
-        //     child: Row(
-        //       crossAxisAlignment: CrossAxisAlignment.center,
-        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //       children: [
-        //         Text(text ?? "No Initial Todo Value"),
-        //         Text(name ?? "No Name"),
-        //         Text(lastName ?? "No Last Name"),
-        //       ],
-        //     ))
-
-        );
+        body: TodoListBuilder(
+            todoList: todoList, updateLocalData: updateLocalData));
   }
 }
