@@ -1,7 +1,8 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:feather_icons/feather_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/addTodo.dart';
 
 class MainScreen extends StatefulWidget {
@@ -12,35 +13,53 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  String? text = ' ';
-  String? name = ' ';
-  String? lastName = ' ';
+  List<String> todoList = [];
 
-  List<String> todoList = [
-    "Code",
-    "Sleep",
-    "Coffee",
-  ];
-
-  void changeText({
-    required String? todoText,
-  }) {
+  void addTodo({required String todoText}) {
+    if (todoList.contains(todoText)) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("Already Exist"),
+              content: Text("$todoText is already Exist"),
+              actions: [
+                InkWell(
+                  child: Text("Close"),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                )
+              ],
+            );
+          });
+      return;
+    }
     setState(() {
-      text = todoText ?? "NO VALUE";
+      todoList.insert(0, todoText);
+    });
+    updateLocalData();
+    Navigator.pop(context);
+  }
+
+  void updateLocalData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await prefs.setStringList('todoList', todoList);
+  }
+
+  void loadLocalData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      todoList = (prefs.getStringList('todoList') ?? []).toList();
     });
   }
 
-  // void changeName({required String? nameText}) {
-  //   setState(() {
-  //     name = nameText ?? "NO VALUE";
-  //   });
-  // }
-
-  // void changeLastName({required String? lastNameText}) {
-  //   setState(() {
-  //     lastName = lastNameText ?? "NO VALUE";
-  //   });
-  // }
+  @override
+  void initState() {
+    loadLocalData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,10 +81,9 @@ class _MainScreenState extends State<MainScreen> {
                           SingleChildScrollView(
                               child: Container(
                             margin: EdgeInsets.all(15),
-                            // height: 200,
                             padding: MediaQuery.of(context).viewInsets,
                             child: AddTodo(
-                              changeText: changeText,
+                              addTodo: addTodo,
                               // changeName: changeName,
                               // changeLastName: changeLastName,
                             ),
@@ -83,13 +101,39 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
           ],
-          title: Text("Todo App"),
+          title: Text("TODO APP"),
           centerTitle: true,
         ),
         body: ListView.builder(
             itemCount: todoList.length,
             itemBuilder: (BuildContext context, int index) {
               return ListTile(
+                onLongPress: () {
+                  print('Long Pressed');
+                },
+                onTap: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                          padding: EdgeInsets.all(20),
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  todoList.removeAt(index);
+                                });
+                                updateLocalData();
+                                Navigator.pop(context);
+                              },
+                              child: Text("Mark as done"),
+                            ),
+                          ),
+                        );
+                      });
+                },
                 title: Text(todoList[index]),
               );
             })

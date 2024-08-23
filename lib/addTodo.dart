@@ -5,15 +5,14 @@ import 'package:flutter/material.dart';
 class AddTodo extends StatefulWidget {
   AddTodo({
     super.key,
-    required this.changeText,
-
+    required this.addTodo,
     // required this.changeName,
     // required this.changeLastName
   });
 
   void Function({
     required String todoText,
-  }) changeText;
+  }) addTodo;
 
   // void Function({
   //   required String nameText,
@@ -28,8 +27,6 @@ class AddTodo extends StatefulWidget {
 
 class _AddTodoState extends State<AddTodo> {
   TextEditingController todoText = TextEditingController();
-  // TextEditingController nameText = TextEditingController();
-  // TextEditingController lastNameText = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -41,36 +38,12 @@ class _AddTodoState extends State<AddTodo> {
           decoration: InputDecoration(labelText: 'Add some todo'),
           controller: todoText,
         ),
-        // TextField(
-        //   autofocus: true,
-        //   decoration: InputDecoration(
-        //     hintText: 'Name',
-        //   ),
-        //   controller: nameText,
-        // ),
-        // TextField(
-        //   autofocus: true,
-        //   decoration: InputDecoration(
-        //     hintText: 'Last Name',
-        //   ),
-        //   controller: lastNameText,
-        // ),
         ElevatedButton(
             onPressed: () {
-              print(todoText.text);
-
-              widget.changeText(
-                todoText: todoText.text,
-              );
-              // widget.changeName(
-              //   nameText: nameText.text,
-              // );
-              //  widget.changeLastName(
-              //   lastNameText: lastNameText.text,
-              // );
+              if (todoText.text.isNotEmpty) {
+                widget.addTodo(todoText: todoText.text);
+              }
               todoText.text = '';
-              // nameText.text = '';
-              // lastNameText.text = '';
             },
             child: Text("Add Button")),
       ],
