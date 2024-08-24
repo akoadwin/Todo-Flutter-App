@@ -36,8 +36,24 @@ class _TodoListBuilderState extends State<TodoListBuilder> {
                   widget.updateLocalData();
                 },
                 background: Container(
-                  color: Colors.green.shade300,
-                  child: const Icon(Icons.check),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.green.shade300,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(15),
+                    child: const Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            "Mark as done",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 key: UniqueKey(),
                 child: ListTile(
