@@ -118,7 +118,9 @@ class _MainScreenState extends State<MainScreen> {
               ),
               ListTile(
                 onTap: () {
-                  launchUrl(Uri.parse('https://github.com/akoadwin'));
+                  launchUrl(Uri.parse('https://github.com/akoadwin'),
+                      mode: LaunchMode.inAppWebView);
+                  return Navigator.pop(context);
                 },
                 leading: const Icon(
                   Icons.person_4_sharp,
@@ -130,7 +132,9 @@ class _MainScreenState extends State<MainScreen> {
               ),
               ListTile(
                 onTap: () {
-                  launchUrl(Uri.parse('mailto:floresgodwin@gg.com'));
+                  launchUrl(Uri.parse('mailto:cs31a8.matao@gmail.com'),
+                      mode: LaunchMode.externalApplication);
+                  return Navigator.pop(context);
                 },
                 leading: const Icon(
                   Icons.email_sharp,
